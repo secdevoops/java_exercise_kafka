@@ -1,0 +1,22 @@
+app:
+  number_of_threads: 1
+  max_tweets: 100
+  max_time_in_milliseconds: 30000
+  kafka:
+    topic:
+      name: myTopic
+
+twitter:
+  consumer_key: RLSrphihyR4G2UxvA0XBkLAdl
+  consumer_secret: FTz2KcP1y3pcLw0XXMX5Jy3GTobqUweITIFy4QefullmpPnKm4
+  search: bieber
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:29092
+    consumer:
+      group-id: myGroup
+      value-deserializer: org.interview.serializer.TweetDataDeserializer
+    producer:
+      value-serializer: org.interview.serializer.TweetDataSerializer
+

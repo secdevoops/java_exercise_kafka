@@ -1,4 +1,4 @@
-package org.interview.serializer;
+package com.secdevoops.serializer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,7 +6,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Serializer;
-import org.interview.data.Tweet;
+import com.secdevoops.data.Tweet;
 
 @Slf4j
 public class TweetDataSerializer implements Serializer<Tweet> {

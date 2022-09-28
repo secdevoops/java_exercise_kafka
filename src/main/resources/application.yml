@@ -16,7 +16,7 @@ spring:
     bootstrap-servers: localhost:29092
     consumer:
       group-id: myGroup
-      value-deserializer: org.interview.serializer.TweetDataDeserializer
+      value-deserializer: com.secdevoops.serializer.TweetDataDeserializer
     producer:
-      value-serializer: org.interview.serializer.TweetDataSerializer
+      value-serializer: com.secdevoops.serializer.TweetDataSerializer
 

@@ -1,9 +1,8 @@
-package org.interview.components;
+package com.secdevoops.components;
 
 import java.util.concurrent.CountDownLatch;
-import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.interview.data.Tweet;
+import com.secdevoops.data.Tweet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;

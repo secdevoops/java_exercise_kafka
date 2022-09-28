@@ -10,7 +10,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
  */
-package org.interview.oauth.twitter;
+package com.secdevoops.oauth.twitter;
 
 import java.io.IOException;
 import java.io.PrintStream;

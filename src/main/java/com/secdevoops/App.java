@@ -1,10 +1,10 @@
-package org.interview;
+package com.secdevoops;
 
+import com.secdevoops.oauth.twitter.TwitterAuthenticationException;
+import com.secdevoops.services.TwitterService;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.NewTopic;
-import org.interview.oauth.twitter.TwitterAuthenticationException;
-import org.interview.services.TwitterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;

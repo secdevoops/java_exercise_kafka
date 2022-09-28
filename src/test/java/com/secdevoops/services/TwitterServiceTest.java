@@ -1,5 +1,4 @@
-package org.interview.components;
-
+package com.secdevoops.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
@@ -10,12 +9,16 @@ import static org.mockito.Mockito.when;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpResponse;
+import com.secdevoops.components.TwitterConsumer;
+import com.secdevoops.components.TwitterProducer;
+import com.secdevoops.components.TwitterQueue;
+import com.secdevoops.oauth.twitter.TwitterAuthenticationException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import lombok.extern.slf4j.Slf4j;
-import org.interview.oauth.twitter.TwitterAuthenticationException;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +33,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 @TestInstance(PER_CLASS)
-public class TwitterProducerTest {
+public class TwitterServiceTest {
 
     private static final String TWEET = "{\"created_at\":\"Wed Jul 27 07:25:26 +0000 2022\",\"id\":1552193429320257536,"
             + "\"id_str\":\"1552193429320257536\",\"text\":\"#Vh1Playlist Play As Long As You Love Me by Justin Bieber!!\","
@@ -67,6 +70,10 @@ public class TwitterProducerTest {
 
     private TwitterQueue twitterQueue;
 
+    private TwitterProducer twitterProducer;
+
+    private TwitterConsumer twitterConsumer;
+
     private MockedConstruction<BufferedReader> mockedConstruction;
 
     @BeforeAll
@@ -84,53 +91,58 @@ public class TwitterProducerTest {
     }
 
     @BeforeEach
-    void beforeEach() throws IOException {
+    void beforeEach() throws IOException, TwitterAuthenticationException {
         when(httpRequestFactory.buildGetRequest(any())).thenReturn(request);
         when(request.execute()).thenReturn(response);
         when(response.getContent()).thenReturn(inputStream);
+
         twitterQueue = new TwitterQueue();
         ReflectionTestUtils.setField(twitterQueue, "maxTweets", 2);
         twitterQueue.init();
-    }
 
-        @Test
-    public void testReachMaxTweets() throws TwitterAuthenticationException, IOException, InterruptedException {
-        TwitterProducer twitterProducer = spy(new TwitterProducer());
-        ReflectionTestUtils.setField(twitterProducer, "search", "bieber");
-        ReflectionTestUtils.setField(twitterProducer, "maxTweets", 2);
-        ReflectionTestUtils.setField(twitterProducer, "maxTimeInMilliseconds", 2000);
+
+        twitterProducer = spy(new TwitterProducer());
         ReflectionTestUtils.setField(twitterProducer, "twitterQueue", twitterQueue);
-        //twitterProducer.init(httpRequestFactory);
-        Thread producerThread = new Thread(twitterProducer);
-        producerThread.start();
-        try {
-            producerThread.join();
-        } catch (InterruptedException e) {
-            log.error("Error on thread", e);
-        }
-        assertEquals(2,twitterQueue.getBlockingQueue().size());
-        assertEquals(TWEET, twitterQueue.getBlockingQueue().take());
-        assertEquals(1,twitterQueue.getBlockingQueue().size());
-        assertEquals(TWEET, twitterQueue.getBlockingQueue().take());
-        assertEquals(0,twitterQueue.getBlockingQueue().size());
+        //twitterProducer.init();
+
+        twitterConsumer = spy(new TwitterConsumer());
+        ReflectionTestUtils.setField(twitterConsumer, "maxTimeInMilliseconds", 2000);
+        ReflectionTestUtils.setField(twitterConsumer, "twitterQueue", twitterQueue);
     }
 
     @Test
-    public void testReachMaxTime() throws TwitterAuthenticationException, IOException {
-        TwitterProducer twitterProducer = spy(new TwitterProducer());
-        ReflectionTestUtils.setField(twitterProducer, "search", "martes");
-        ReflectionTestUtils.setField(twitterProducer, "maxTweets", 2);
-        ReflectionTestUtils.setField(twitterProducer, "maxTimeInMilliseconds", 1);
-        ReflectionTestUtils.setField(twitterProducer, "twitterQueue", twitterQueue);
-        //twitterProducer.init(httpRequestFactory);
-        Thread producerThread = new Thread(twitterProducer);
-        producerThread.start();
-        try {
-            producerThread.join();
-        } catch (InterruptedException e) {
-            log.error("Error on thread", e);
-        }
-        assertEquals(1,twitterQueue.getBlockingQueue().size());
+    public void testFindTweets() throws IOException, TwitterAuthenticationException, InterruptedException {
+        TwitterService twitterService = new TwitterService();
+        ReflectionTestUtils.setField(twitterService, "search", "bieber");
+        ReflectionTestUtils.setField(twitterService, "maxTweets", 2);
+        ReflectionTestUtils.setField(twitterService, "maxTimeInMilliseconds", 2000);
+        ReflectionTestUtils.setField(twitterService, "producerThreadNumber", 1);
+        ReflectionTestUtils.setField(twitterService, "consumerThreadNumber", 1);
+        ReflectionTestUtils.setField(twitterService, "twitterProducer", twitterProducer);
+        ReflectionTestUtils.setField(twitterService, "twitterConsumer", twitterConsumer);
+        ReflectionTestUtils.setField(twitterService, "twitterQueue", twitterQueue);
+        twitterService.findTweets();
+
+        assertEquals(0,twitterQueue.getBlockingQueue().size());
+        assertEquals(2, twitterQueue.getTweetList().get().size());
+        Assertions.assertEquals("1552193429320257536", twitterQueue.getTweetList().get().get(0).getId());
+        Assertions.assertEquals("1552193429320257536", twitterQueue.getTweetList().get().get(1).getId());
+    }
+
+    @Test
+    public void testNoTweetsDueToReachMaxTimeOnProducer() throws IOException, TwitterAuthenticationException, InterruptedException {
+        ReflectionTestUtils.setField(twitterProducer, "maxTimeInMilliseconds", 0);
+
+        TwitterService twitterService = new TwitterService();
+        ReflectionTestUtils.setField(twitterService, "producerThreadNumber", 1);
+        ReflectionTestUtils.setField(twitterService, "consumerThreadNumber", 1);
+        ReflectionTestUtils.setField(twitterService, "twitterProducer", twitterProducer);
+        ReflectionTestUtils.setField(twitterService, "twitterConsumer", twitterConsumer);
+        ReflectionTestUtils.setField(twitterService, "twitterQueue", twitterQueue);
+        twitterService.findTweets();
+
+        assertEquals(0,twitterQueue.getBlockingQueue().size());
+        assertEquals(1, twitterQueue.getTweetList().get().size());
     }
 
 }

@@ -1,4 +1,4 @@
-package org.interview.data;
+package com.secdevoops.data;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

@@ -1,29 +1,16 @@
-package org.interview.components;
+package com.secdevoops.components;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpResponse;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
 import lombok.extern.slf4j.Slf4j;
-import org.interview.oauth.twitter.TwitterAuthenticationException;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)

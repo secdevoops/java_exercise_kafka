@@ -1,11 +1,11 @@
-package org.interview.serializer;
+package com.secdevoops.serializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Deserializer;
-import org.interview.data.Tweet;
+import com.secdevoops.data.Tweet;
 
 @Slf4j
 public class TweetDataDeserializer implements Deserializer<Tweet> {
